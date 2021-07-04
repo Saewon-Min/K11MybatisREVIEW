@@ -6,14 +6,28 @@
 
 
 #{}
-- 파라미터가 String 형태로 들어와서 자동으로 파라미터 형태가 된다.
-- 자동으로 ''이 붙는다.
+- 파라미터가 String 형태로 들어와서 자동으로 ''이 붙는다.
 	예] #{user_id}의 user_id의 값이 abc라면
 		쿼리문에서는 user_id = 'abc'의 형태가 된다.
 - 쿼리 주입을 예방할 수 있어 보안측면에서 유리하다.		
 
+예시]
+<select id="select_list" parameterType="HashMap" resultType="HashMap">
+	SELECT user_nm, user_id
+	FROM user
+	WHERE user_id=#{user_id} AND user_pw=#{user_pw}
+</select>
 
 ${}
+- 파라미터가 바로 출력된다.
+- 해당 컬럼의 자료형에 맞춰 파라미터의 자료형이 변경된다.
+- 쿼리 주입을 예방할 수 없어 보안 측면에서 불리하다.
+	그러므로 사용자의 입력을 전달할때는 사용하지 않는것이 낫다
+- 테이블이나 컬럼명을 파라미터로 전달하고 싶을때 사용한다.
+	#{}은 자동으로 ''이 붙기때문에 이 경우에는 사용할 수 없다.
 
-
-
+예시]
+<select id="select_list" parameterType="HashMap" resultType="HashMap">
+	SELECT ${column}
+	FROM	user
+</select>

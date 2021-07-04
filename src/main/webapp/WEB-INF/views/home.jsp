@@ -14,5 +14,23 @@
 		</a>
 	</li>
 
+
+	<h2>Collection 사용하기</h2>
+	<li>
+		<a href="Collection/hashMap.do" target="_blank">
+			hashMap.do 바로가기
+		</a>
+	</li>
+	<li>
+		<a href="Collection/arrayList.do" target="_blank">
+			arrayLisy.do 바로가기
+		</a>
+	</li>
+
+	
+
+
+
+
 </body>
 </html>

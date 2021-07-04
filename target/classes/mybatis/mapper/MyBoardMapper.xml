@@ -71,25 +71,91 @@ update/delete
 <mapper namespace="mybatis.MybatisDAOImpl"><!-- 인터페이스의 위치(패키지명을 포함한 풀경로) -->
 
 	<!-- id는 메소드명과 동일하다. -->
+	<!-- 검색어 처리
+		: 검색어가 있는 경우 동적으로 쿼리문을 변경해야 하므로
+		동적쿼리를 위해 <if태그를 사용한다. JSTL과 사용법이 동일하다. 
+	 -->
+	 
+	 <!--  
+	 	3차 버전 : 여러 단어 검색 처리
+	 	
+	 	반복을 통해 동적 쿼리를 만들때는 foreach태그를 사용한다.
+	 	
+	 	collection
+	 		: 반복에 사용할 컬렉션 객체
+	 	item
+	 		: 반복시 사용할 변수
+	 	open
+	 		: 동적 쿼리문의 시작 부분
+	 	close
+	 		: 동적 쿼리문의 종료 부분
+	 	separator
+			: 반복할 때 사용할 구분자로 and, or, 콤마 등을
+			 사용할 수 있다.(콤마는 in절을 쓸때 사용함)
+			 
+		아래의 쿼리문에 in절을 쓴다면
+		if test="searchTxt!=null"
+			where ${searchField} like
+				foreach collection = "searchTxt" item="str" open="(" close=")"
+					separator=","
+					#{str}
+				foreach
+		if
+		
+		
+		이런식으로 사용할 것	 
+			 
+			 	 	
+	 	
+	 -->
+	 
 	<select id="getTotalCount" resultType="int" 
 		parameterType="mybatis.ParameterDTO">
 		SELECT COUNT(*) FROM myboard
 		
 		<if test="searchTxt!=null and !searchTxt.equals('')">
-			WHERE ${searchField} LIKE '%'||#{searchTxt}||'%'
+			WHERE 
+			<foreach collection="searchTxt" item="str" open="(" close=")"
+			separator="or">
+				${searchField} LIKE '%'||#{str}||'%'
+			</foreach>	
 		</if>
 		
 	</select>
 
-	<select id="listPage" resultType="mybatis.MyBoardDTO">
+	<select id="listPage" resultType="mybatis.MyBoardDTO"
+		parameterType="mybatis.ParameterDTO">
 		SELECT * FROM (
 			SELECT Tb.*, rownum rNum FROM(
-				SELECT * FROM myboard ORDER BY idx DESC
+				SELECT * FROM myboard 
+				
+				<if test="searchTxt!=null and !searchTxt.equals('')">
+					WHERE 
+					<foreach collection="searchTxt" item="str" open="(" close=")"
+					separator="or">
+						${searchField} LIKE '%'||#{str}||'%'
+					</foreach>
+				</if>
+				
+				ORDER BY idx DESC
 			) Tb
 			
 		)
-		WHERE rNum BETWEEN #{param1} AND #{param2}
+		
+		WHERE rNum<![CDATA[>=]]>#{start} AND rNum<![CDATA[<=]]>#{end};
+		<!-- WHERE rNum BETWEEN #{start} AND #{end} -->
 	</select>
+	<!--  
+		CDATA
+			: Unparsed Character Data.
+			파싱되지 않은 문자 데이터를 의미하는 용어로
+			Mapper에서는 꺽쇄로 시작되는 모든 문자를 엘리먼트(태그)로
+			판단하기 때문에 쿼리문 사이에 비교 연산자를 사용할때는
+			반드시 위와 같이 처리해야한다.
+	-->
+	
+	
+	
 	
 	
 	<!--  
@@ -137,6 +203,39 @@ update/delete
 	</delete>
 	
 	
+	<!-- parameterType="java.util.Map" 또는 "map" -->
+	<select id="hashMapUse" resultType="mybatis.MyBoardDTO"
+		parameterType="java.util.Map">
+		SELECT * FROM myboard
+		WHERE id=#{key_id} AND name=#{key_name}
+		ORDER BY idx DESC
+	</select>
+	
+	
+	
+	
+	<!-- parameterType="java.util.ArrayList" 또는 "list" -->
+	<select id="arrayListUse" resultType="mybatis.MyBoardDTO"
+		parameterType="java.util.ArrayList">
+		SELECT * FROM myboard
+		WHERE
+		<!--  
+			리스트의 경우 collection="list"와 같이 파라미터 명을
+			list라고 쓰기로 결정되어있다.
+		-->
+		<foreach collection="list" item="item" index="index"
+			open="(" close=")" separator="or">
+			name=#{item}
+		</foreach>
+		ORDER BY idx DESC	
+	</select>
+	<!--  
+		위의 <foreach 태그를 통해 아래와 같은 쿼리가 만들어진다.
+		(
+			name='옹성우' or name='김선우' or name='김선호' or ...
+		)
+	-->
+		
 	
 </mapper>
 

@@ -51,7 +51,7 @@ function deleteRow(idx) {
 		<input type="text" name="searchTxt"/>
 		<input type="submit" value="검색"/>
 	</form>
-	
+	여러 단어를 검색하고 싶을때는 스페이스로 구분해주세요
 	</div>
 		
 	<!-- 방명록 반복 부분 s -->

@@ -1,6 +1,8 @@
 package mybatis;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
@@ -64,8 +66,11 @@ public interface MybatisDAOImpl {
 	// 삭제처리
 	public int delete(String idx, String id);
 	
-	
-	
+	// Map 컬렉션 사용을 위한 메소드
+	public ArrayList<MyBoardDTO> hashMapUse(Map<String, String> hMap);
+
+	// List컬렉션 사용을 위한 메소드
+	public ArrayList<MyBoardDTO> arrayListUse(List<String> aList);
 	
 	
 	

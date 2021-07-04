@@ -34,11 +34,13 @@ public class MybatisController {
 	@RequestMapping("/mybatis/list.do")
 	public String list(Model model, HttpServletRequest req) {
 		
+		// 각종 파라미터를 저장하기 위한 DTO객체 생성
 		ParameterDTO parameterDTO = new ParameterDTO();
-		parameterDTO.setSearchField(req.getParameter("searchField"));
-		parameterDTO.setSearchTxt(req.getParameter("searchTxt"));
-		System.out.println("검색어 : "+parameterDTO.getSearchTxt());
 		
+		// 검색 파라미터 저장
+		parameterDTO.setSearchField(req.getParameter("searchField"));
+		//parameterDTO.setSearchTxt(req.getParameter("searchTxt"));
+		 
 		
 		// 방명록 테이블의 게시물 개수 카운트
 		/*
@@ -46,6 +48,7 @@ public class MybatisController {
 		추상메소드를 호출한다. 그러면 mapper에 정의된 쿼리문이
 		실행되는 형식으로 동작한다.
 		 */
+		// 검색 파라미터를 기반으로 게시물 수 카운트 하기
 		int totalRecordCount =
 				sqlSession.getMapper(MybatisDAOImpl.class).getTotalCount(parameterDTO);
 		
@@ -66,18 +69,47 @@ public class MybatisController {
 		int start = (nowPage-1)*pageSize+1;
 		int end = nowPage*pageSize;
 		
+		// 기존과는 다르게 시작, 끝을 DTO에 저장한다.
 		parameterDTO.setStart(start);
 		parameterDTO.setEnd(end);
 		
-		// 목록에 출력할 게시물을 얻어오기 위한 쿼리 실행
+		// DTO객체를 기반으로 Mapper 호출
 		ArrayList<MyBoardDTO> lists =
 				sqlSession.getMapper(MybatisDAOImpl.class).listPage(parameterDTO);
+		
+		// mybatis 기본 쿼리문 출력하기(동적 쿼리문 확인용)
+		String sql = sqlSession.getConfiguration().getMappedStatement("listPage")
+					.getBoundSql(parameterDTO).getSql();
+		System.out.println("sql="+sql);
+		
+		
+		
+		
+		// 검색어를 스페이스로 구분하는 경우
+		ArrayList<String> searchLists = null;
+
+		if(req.getParameter("searchTxt")!=null) {
+			/*
+			스페이스로 구분된 검색어를 받은 후 split하여 List컬렉션에 추가한다.
+			검색어의 개수만큼 추가된다.
+			 */
+			searchLists = new ArrayList<String>();
+			String[] sTxtArray = req.getParameter("searchTxt").split(" ");
+			for(String str : sTxtArray) {
+				searchLists.add(str);
+			}
+			
+		}
+		
+		parameterDTO.setSearchTxt(searchLists);
 		
 		// 페이지 번호 출력
 		String pagingImg =
 				PagingUtil.pagingImg(totalRecordCount, pageSize, blockPage, nowPage, req.getContextPath()+"/mybatis/list.do?");
 		
 		model.addAttribute("pagingImg",pagingImg);
+		
+
 		
 		// 내용에 대한 줄바꿈 처리
 		for(MyBoardDTO dto : lists) {
