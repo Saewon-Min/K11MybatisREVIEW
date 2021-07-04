@@ -1,0 +1,19 @@
+[Mybatis]
+
+@Controller 	@Service			 @Repository
+컨트롤러 	- 	인터페이스		-	 Mapper(DAO)
+
+
+
+#{}
+- 파라미터가 String 형태로 들어와서 자동으로 파라미터 형태가 된다.
+- 자동으로 ''이 붙는다.
+	예] #{user_id}의 user_id의 값이 abc라면
+		쿼리문에서는 user_id = 'abc'의 형태가 된다.
+- 쿼리 주입을 예방할 수 있어 보안측면에서 유리하다.		
+
+
+${}
+
+
+
