@@ -28,7 +28,18 @@
 	</li>
 
 	
-
+	<!-- 컨트롤러 : TranscationController -->
+	<h2>트랜잭션(Transaction)</h2>
+	<li>
+		<a href="transaction/byTicketMain.do" target="_blank">
+			티켓구매하기1
+		</a>
+	</li>
+	<li>
+		<a href="transaction/buyTicketTpl.do" target="_blank">
+			티켓구매하기2
+		</a>
+	</li>
 
 
 
